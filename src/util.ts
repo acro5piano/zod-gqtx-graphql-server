@@ -43,3 +43,7 @@ export function brandedUuid<T extends string>() {
     'Invalid UUID',
   )
 }
+
+export type NullishObject<T extends object> = {
+  [k in keyof T]: null | T[k]
+}

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { brandedUuid, type MakeId } from '../util'
+import { brandedUuid, type MakeId, type NullishObject } from '../util'
 import type { UserId } from './user'
 
 export type PostId = MakeId<'Post'>
@@ -10,3 +10,6 @@ export const PostSchema = z.object({
   title: z.string().min(5).max(50),
 })
 export type Post = z.infer<typeof PostSchema>
+
+export const CreatePostSchema = PostSchema.pick({ title: true })
+export type CreatePostType = NullishObject<z.infer<typeof CreatePostSchema>>

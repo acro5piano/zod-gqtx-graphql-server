@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { brandedUuid, type MakeId } from '../util'
+import { brandedUuid, type MakeId, type NullishObject } from '../util'
 
 export type UserId = MakeId<'User'>
 
@@ -16,7 +16,6 @@ export const CreateUserParams = UserSchema.omit({
   id: true,
   password: true,
 }).partial()
-export type CreateUserParamsType = z.infer<typeof CreateUserParams>
-export type CreateUserParamsTypeNullish = {
-  [k in keyof CreateUserParamsType]: null | CreateUserParamsType[k]
-}
+export type CreateUserParamsType = NullishObject<
+  z.infer<typeof CreateUserParams>
+>

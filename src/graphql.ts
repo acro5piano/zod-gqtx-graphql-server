@@ -9,10 +9,15 @@ import {
   CreateUserParams,
   PublicUserFields,
   UserSchema,
-  type CreateUserParamsTypeNullish,
+  type CreateUserParamsType,
   type PublicUserType,
 } from './models/user'
-import { PostSchema, type Post } from './models/post'
+import {
+  CreatePostSchema,
+  PostSchema,
+  type CreatePostType,
+  type Post,
+} from './models/post'
 
 const UserType = Gql.Object<PublicUserType>({
   name: 'User',
@@ -27,7 +32,7 @@ const UserType = Gql.Object<PublicUserType>({
         },
       }),
       Gql.Field({
-        name: 'greeting',
+        name: 'posts',
         type: Gql.NonNull(Gql.List(Gql.NonNull(PostType))),
         resolve: (user) => {
           return db.post.filter((p) => p.userId === user.id)
@@ -36,14 +41,19 @@ const UserType = Gql.Object<PublicUserType>({
     ),
 })
 
+const CreateUserInput = Gql.InputObject<CreateUserParamsType>({
+  name: 'CreateUserInput',
+  fields: () => zodTypeToGqlInputFields(CreateUserParams),
+})
+
 const PostType = Gql.Object<Post>({
   name: 'Post',
   fields: () => zodTypeToGqlFields(PostSchema),
 })
 
-const CreateUserInput = Gql.InputObject<CreateUserParamsTypeNullish>({
-  name: 'CreateUserInput',
-  fields: () => zodTypeToGqlInputFields(CreateUserParams),
+const CreatePostInput = Gql.InputObject<CreatePostType>({
+  name: 'CreatePostInput',
+  fields: () => zodTypeToGqlInputFields(CreatePostSchema),
 })
 
 const QueryType = Gql.Query({
@@ -74,6 +84,23 @@ const MutationType = Gql.Mutation({
         })
         db.user.push(user)
         return user
+      },
+    }),
+    Gql.Field({
+      name: 'createPost',
+      type: Gql.NonNull(PostType),
+      args: {
+        userId: Gql.Arg({ type: Gql.NonNullInput(Gql.ID) }),
+        input: Gql.Arg({ type: Gql.NonNullInput(CreatePostInput) }),
+      },
+      resolve: (_, args) => {
+        const post = PostSchema.parse({
+          id: v4(),
+          userId: args.userId,
+          ...args.input,
+        })
+        db.post.push(post)
+        return post
       },
     }),
   ],
