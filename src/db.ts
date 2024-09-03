@@ -6,6 +6,7 @@ export type Database = {
   post: Post[]
 }
 
+// Fake database for demo purpose
 export const db: Database = {
   user: [],
   post: [],

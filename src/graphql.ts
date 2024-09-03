@@ -6,10 +6,10 @@ import { db } from './db'
 
 import { zodTypeToGqlFields, zodTypeToGqlInputFields } from './util'
 import {
-  CreateUserParams,
-  PublicUserFields,
+  CreateUserSchema,
+  PublicUserSchema,
   UserSchema,
-  type CreateUserParamsType,
+  type CreateUserType,
   type PublicUserType,
 } from './models/user'
 import {
@@ -23,7 +23,7 @@ const UserType = Gql.Object<PublicUserType>({
   name: 'User',
   fields: () =>
     zodTypeToGqlFields(
-      PublicUserFields,
+      PublicUserSchema,
       Gql.Field({
         name: 'greeting',
         type: Gql.NonNull(Gql.String),
@@ -41,9 +41,9 @@ const UserType = Gql.Object<PublicUserType>({
     ),
 })
 
-const CreateUserInput = Gql.InputObject<CreateUserParamsType>({
+const CreateUserInput = Gql.InputObject<CreateUserType>({
   name: 'CreateUserInput',
-  fields: () => zodTypeToGqlInputFields(CreateUserParams),
+  fields: () => zodTypeToGqlInputFields(CreateUserSchema),
 })
 
 const PostType = Gql.Object<Post>({
