@@ -26,6 +26,18 @@ tRPC is great, but the downside is not ignorable to me:
 
 The idea is great, but making GraphQL + Zod combination should be great too.
 
+> Why gqtx?
+
+gqtx is the great type experience out of the box. Nexus can be used too. No strong reason.
+
+> Why Zod?
+
+The ecosystem is great.
+
+> What about the frontend?
+
+React + URQL is my favorite, but it's not scope of this repository.
+
 # Getting Started
 
 To install dependencies:
