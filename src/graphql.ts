@@ -12,24 +12,38 @@ import {
   type CreateUserParamsTypeNullish,
   type PublicUserType,
 } from './models/user'
+import { PostSchema, type Post } from './models/post'
 
 const UserType = Gql.Object<PublicUserType>({
   name: 'User',
-  fields: zodTypeToGqlFields(
-    PublicUserFields,
-    Gql.Field({
-      name: 'greeting',
-      type: Gql.NonNull(Gql.String),
-      resolve: (user) => {
-        return `Hello, ${user.name}`
-      },
-    }),
-  ),
+  fields: () =>
+    zodTypeToGqlFields(
+      PublicUserFields,
+      Gql.Field({
+        name: 'greeting',
+        type: Gql.NonNull(Gql.String),
+        resolve: (user) => {
+          return `Hello, ${user.name}`
+        },
+      }),
+      Gql.Field({
+        name: 'greeting',
+        type: Gql.NonNull(Gql.List(Gql.NonNull(PostType))),
+        resolve: (user) => {
+          return db.post.filter((p) => p.userId === user.id)
+        },
+      }),
+    ),
+})
+
+const PostType = Gql.Object<Post>({
+  name: 'Post',
+  fields: () => zodTypeToGqlFields(PostSchema),
 })
 
 const CreateUserInput = Gql.InputObject<CreateUserParamsTypeNullish>({
   name: 'CreateUserInput',
-  fields: zodTypeToGqlInputFields(CreateUserParams),
+  fields: () => zodTypeToGqlInputFields(CreateUserParams),
 })
 
 const QueryType = Gql.Query({

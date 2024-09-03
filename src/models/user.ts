@@ -1,7 +1,10 @@
 import { z } from 'zod'
+import { brandedUuid, type MakeId } from '../util'
+
+export type UserId = MakeId<'User'>
 
 export const UserSchema = z.object({
-  id: z.string().uuid().brand<'User'>(),
+  id: brandedUuid<UserId>(),
   name: z.string().min(3),
   password: z.string().min(8),
 })
