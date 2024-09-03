@@ -1,8 +1,28 @@
-import { Gql, type Field, type InputFieldMap } from 'gqtx'
-import { z } from 'zod'
+import { Gql, type Field, type InputFieldMap, type ScalarType } from 'gqtx'
+import { z, ZodBoolean, ZodNumber, ZodOptional, ZodString, ZodType } from 'zod'
 
 export function keys<T extends object>(obj: T) {
   return Object.keys(obj) as Array<keyof T>
+}
+
+function zodScalarToGqlScalar(zodType: ZodType): null | ScalarType<any> {
+  if (zodType instanceof ZodOptional) {
+    return zodScalarToGqlScalar(zodType.unwrap())
+  }
+  if (zodType instanceof ZodString) {
+    return Gql.String
+  }
+  if (zodType instanceof ZodBoolean) {
+    return Gql.Boolean
+  }
+  if (zodType instanceof ZodNumber) {
+    if (zodType.isInt) {
+      return Gql.Int
+    } else {
+      return Gql.Float
+    }
+  }
+  return null
 }
 
 export function zodTypeToGqlFields<T extends z.ZodRawShape>(
@@ -15,7 +35,17 @@ export function zodTypeToGqlFields<T extends z.ZodRawShape>(
     Gql.Field({ name: 'id', type: Gql.NonNull(Gql.ID) }),
   ]
   for (const key of keys(publicFields.shape)) {
-    fields.push(Gql.Field({ name: key as any, type: Gql.NonNull(Gql.String) }))
+    const value = publicFields.shape[key]
+    const gqlType = zodScalarToGqlScalar(value)
+    if (gqlType) {
+      if (value.isNullable()) {
+        fields.push(Gql.Field({ name: key as string, type: gqlType }))
+      } else {
+        fields.push(
+          Gql.Field({ name: key as string, type: Gql.NonNull(gqlType) }),
+        )
+      }
+    }
   }
   for (const f of additionalFields) {
     fields.push(f)
@@ -26,9 +56,17 @@ export function zodTypeToGqlFields<T extends z.ZodRawShape>(
 export function zodTypeToGqlInputFields<Src, T extends z.ZodRawShape>(
   inputFields: z.ZodObject<T>,
 ): InputFieldMap<Src> {
-  const fields = {} as any
+  const fields: InputFieldMap<any> = {}
   for (const key of keys(inputFields.shape)) {
-    fields[key] = { type: Gql.String }
+    const value = inputFields.shape[key]
+    const gqlType = zodScalarToGqlScalar(value)
+    if (gqlType) {
+      if (value.isNullable()) {
+        fields[key] = { type: gqlType }
+      } else {
+        fields[key] = { type: Gql.NonNullInput(gqlType) }
+      }
+    }
   }
   return fields
 }

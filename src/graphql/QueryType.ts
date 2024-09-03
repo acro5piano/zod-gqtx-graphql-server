@@ -8,7 +8,14 @@ export const QueryType = Gql.Query({
       name: 'users',
       type: Gql.NonNull(Gql.List(Gql.NonNull(UserType))),
       resolve: (_) => {
-        return db.user.map((u) => ({ id: u.id, name: u.name }))
+        // List all fields to check `password` is not included.
+        // Normally `return db.user` is enough.
+        return db.user.map((u) => ({
+          id: u.id,
+          name: u.name,
+          age: u.age,
+          isActive: u.isActive,
+        }))
       },
     }),
   ],

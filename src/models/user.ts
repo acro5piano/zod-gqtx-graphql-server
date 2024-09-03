@@ -7,6 +7,8 @@ export const UserSchema = z.object({
   id: brandedUuid<UserId>(),
   name: z.string().min(3),
   password: z.string().min(8),
+  isActive: z.boolean(),
+  age: z.number().min(0),
 })
 export type User = z.infer<typeof UserSchema>
 
@@ -16,5 +18,6 @@ export type PublicUserType = z.infer<typeof PublicUserSchema>
 export const UserInputSchema = UserSchema.omit({
   id: true,
   password: true,
-}).partial()
+  isActive: true,
+})
 export type UserInputType = z.infer<typeof UserInputSchema>
