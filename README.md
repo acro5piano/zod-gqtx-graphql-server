@@ -58,6 +58,8 @@ bun run --watch src/main.ts
 
 # Possible TODOs
 
+- [ ] Enum values GQL map
+- [ ] Nullish handling both in type & input
 - [ ] Generate mutations. Writing mutations by hand is tedious; let's automate it.
 - [ ] Generate Zod interfaces. We currently have to write `z.infer` manually each time.
 - [ ] Create database migrations as described above.
