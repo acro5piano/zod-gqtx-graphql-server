@@ -21,28 +21,42 @@ const PostSchema = z.object({
 type Post = z.infer<typeof PostSchema>
 
 const PublicUserFields = UserSchema.omit({ password: true })
-type F = z.infer<typeof PublicUserFields>
+type PublicUserType = z.infer<typeof PublicUserFields>
 
-type UserFields = [Field<F, any, {}>, ...Field<F, any, {}>[]]
-
-const UserType = Gql.Object<F>({
-  name: 'User',
-  fields: () => {
-    const fields: UserFields = [
+function zodTypeToGqlFields<T extends z.ZodRawShape>(
+  publicFields: z.ZodObject<T>,
+  ...additionalFields: Field<T, any, {}>[]
+) {
+  type F = any
+  type GqlFields = [Field<F, any, {}>, ...Field<F, any, {}>[]]
+  return function fields() {
+    const fields: GqlFields = [
       Gql.Field({ name: 'id', type: Gql.NonNull(Gql.ID) }),
     ]
-    for (const key of keys(PublicUserFields.shape)) {
-      fields.push(Gql.Field({ name: key, type: Gql.NonNull(Gql.String) }))
+    for (const key of keys(publicFields.shape)) {
+      fields.push(
+        Gql.Field({ name: key as any, type: Gql.NonNull(Gql.String) }),
+      )
     }
-    fields.push(
-      Gql.Field({
-        name: 'hoge',
-        type: Gql.NonNull(Gql.String),
-        resolve: () => 'hoge',
-      }),
-    )
+    for (const f of additionalFields) {
+      fields.push(f)
+    }
     return fields
-  },
+  }
+}
+
+const UserType = Gql.Object<PublicUserType>({
+  name: 'User',
+  fields: zodTypeToGqlFields(
+    PublicUserFields,
+    Gql.Field({
+      name: 'greeting',
+      type: Gql.NonNull(Gql.String),
+      resolve: (user) => {
+        return `Hello, ${user.name}`
+      },
+    }),
+  ),
 })
 
 // const CreateUserInput = Gql.InputObject({
