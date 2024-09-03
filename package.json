@@ -1,0 +1,17 @@
+{
+  "name": "20240903_115717",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "gqtx": "^0.9.3",
+    "graphql": "^16.9.0",
+    "graphql-yoga": "^5.7.0",
+    "zod": "^3.23.8"
+  }
+}
