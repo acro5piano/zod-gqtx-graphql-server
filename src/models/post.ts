@@ -11,5 +11,5 @@ export const PostSchema = z.object({
 })
 export type Post = z.infer<typeof PostSchema>
 
-export const CreatePostSchema = PostSchema.pick({ title: true })
-export type CreatePostType = NullishObject<z.infer<typeof CreatePostSchema>>
+export const PostInputSchema = PostSchema.pick({ title: true })
+export type PostInputType = NullishObject<z.infer<typeof PostInputSchema>>

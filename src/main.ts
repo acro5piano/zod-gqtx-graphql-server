@@ -1,4 +1,4 @@
-import { yoga } from './graphql'
+import { yoga } from './graphql/schema'
 
 // @ts-ignore
 Bun.serve({ fetch: yoga, port: 8080 })
